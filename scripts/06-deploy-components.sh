@@ -44,6 +44,10 @@ log_info "--- Deploying Koordinator v1.6.0 ---"
 if helm status koordinator -n default &>/dev/null; then
     log_info "Koordinator is already installed. Skipping."
 else
+    # Label the namespace so Helm can adopt it
+    kubectl label namespace koordinator-system app.kubernetes.io/managed-by=Helm --overwrite 2>/dev/null || true
+    kubectl annotate namespace koordinator-system meta.helm.sh/release-name=koordinator meta.helm.sh/release-namespace=default --overwrite 2>/dev/null || true
+
     helm install koordinator koordinator-sh/koordinator \
         --version 1.6.0 \
         -f "${PROJECT_ROOT}/helm-values/koordinator-values.yaml" \

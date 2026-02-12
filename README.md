@@ -26,15 +26,17 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 - **CPU**: 4+ cores recommended
 - **Disk**: 100GB+ free space
 - **Network**: Internet access for pulling images
+
 ## Conda Environment Setup
 
 The project applications depend on a Python 3.7 conda environment (`interfuser`). The full environment specification is exported in `configs/environment.yml`.
 
 ```bash
-# 1. Install Miniconda (if not already installed)
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
-eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+# 1. Install Anaconda (if not already installed)
+wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
+bash Anaconda3-2024.10-1-Linux-x86_64.sh -b -p $HOME/anaconda3
+eval "$($HOME/anaconda3/bin/conda shell.bash hook)"
+conda init
 
 # 2. Create the environment from the exported file
 conda env create -f configs/environment.yml
@@ -178,9 +180,9 @@ k8s-cluster-deploy/
 └── configs/                  # System configs
     ├── kubeadm-config.yaml
     ├── containerd-config.toml
+    ├── environment.yml       # Conda environment
     └── calico.yaml
 ```
-
 
 ## Notes
 

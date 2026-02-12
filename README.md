@@ -27,6 +27,21 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 - **Disk**: 100GB+ free space
 - **Network**: Internet access for pulling images
 
+## Quick Start
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/chriswong-6/k8s-cluster-deploy.git
+cd k8s-cluster-deploy
+
+# 2. Configure environment
+cp .env.example .env
+nano .env  # Fill in your values (HF_TOKEN, etc.)
+
+# 3. Deploy everything
+sudo ./deploy.sh
+```
+
 ## Conda Environment Setup
 
 The project applications depend on a Python 3.7 conda environment (`cluster`). The full environment specification is exported in `configs/environment.yml`.
@@ -61,21 +76,6 @@ pip install transformers datasets opencv-python-headless timm mmcv-full mmdet
 ```
 
 > **Note**: The `cu111` builds use PTX JIT compilation, allowing them to run on newer GPUs (e.g. RTX 4090 with CUDA 12.6) via NVIDIA Forward Compatibility. See [CUDA Forward Compatibility](#cuda-forward-compatibility-ptx-jit) section below.
-
-## Quick Start
-
-```bash
-# 1. Clone the repository
-git clone <repo-url> k8s-cluster-deploy
-cd k8s-cluster-deploy
-
-# 2. Configure environment
-cp .env.example .env
-nano .env  # Fill in your values (HF_TOKEN, etc.)
-
-# 3. Deploy everything
-sudo ./deploy.sh
-```
 
 ## Configuration
 

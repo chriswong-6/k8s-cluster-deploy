@@ -64,16 +64,14 @@ sudo ./deploy.sh
 
 Key packages included: PyTorch 1.13.1, torchvision 0.14.1, carla 0.9.10, opencv, and more. See `configs/environment.yml` for the complete list.
 
-If you encounter dependency conflicts (e.g. on a different OS/architecture), you can create a minimal environment with PTX-compatible CUDA 11.1 packages:
-
-```bash
-conda create -n cluster python=3.7 -y
-conda activate cluster
-pip install torch==1.9.1+cu111 torchvision==0.10.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
-pip install transformers datasets opencv-python-headless timm mmcv-full mmdet
-```
-
-> **Note**: The `cu111` builds use PTX JIT compilation, allowing them to run on newer GPUs (e.g. RTX 4090 with CUDA 12.6) via NVIDIA Forward Compatibility. See [CUDA Forward Compatibility](#cuda-forward-compatibility-ptx-jit) section below.
+> **Fallback**: If step 4 (`conda env create`) fails due to dependency conflicts, replace step 4 with:
+> ```bash
+> conda create -n cluster python=3.7 -y
+> conda activate cluster
+> pip install torch==1.9.1+cu111 torchvision==0.10.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+> pip install transformers datasets opencv-python-headless timm mmcv-full mmdet
+> ```
+> The `cu111` builds use PTX JIT compilation, allowing them to run on newer GPUs (e.g. RTX 4090 with CUDA 12.6) via NVIDIA Forward Compatibility. See [CUDA Forward Compatibility](#cuda-forward-compatibility-ptx-jit) section below.
 
 ## Configuration
 

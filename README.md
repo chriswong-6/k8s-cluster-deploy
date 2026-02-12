@@ -184,6 +184,56 @@ k8s-cluster-deploy/
     └── calico.yaml
 ```
 
+## CUDA Forward Compatibility (PTX JIT)
+
+The host runs NVIDIA Driver 560.35.03 with CUDA 12.6, but some containers (e.g. `modelproc`) use older CUDA versions (CUDA 11.8, PyTorch built with CUDA 11.7). This is resolved using **NVIDIA CUDA Forward Compatibility** via PTX JIT compilation.
+
+### How it works
+
+The container image includes the `cuda-compat-11-8` package, which installs compatibility libraries under `/usr/local/cuda-11.8/compat/`:
+
+```
+/usr/local/cuda-11.8/compat/
+├── libcuda.so, libcuda.so.1, libcuda.so.520.61.05
+├── libcudadebugger.so.1, libcudadebugger.so.520.61.05
+├── libnvidia-nvvm.so, libnvidia-nvvm.so.4, libnvidia-nvvm.so.520.61.05
+└── libnvidia-ptxjitcompiler.so.1, libnvidia-ptxjitcompiler.so.520.61.05
+```
+
+The `libnvidia-ptxjitcompiler.so` library enables PTX (Parallel Thread Execution) JIT compilation, allowing older CUDA toolkit code to be compiled at runtime for the newer GPU architecture (Ada Lovelace / sm_89 on RTX 4090).
+
+### Building compatible container images
+
+When building images that need to run older CUDA on this host, ensure the `cuda-compat` package is installed in the Dockerfile:
+
+```dockerfile
+# Example: CUDA 11.8 base image with forward compatibility
+FROM nvidia/cuda:11.8.0-runtime-ubuntu20.04
+
+# Install CUDA forward compatibility package
+RUN apt-get update && apt-get install -y cuda-compat-11-8 && rm -rf /var/lib/apt/lists/*
+
+# Ensure the compat libraries are on LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/cuda-11.8/compat:${LD_LIBRARY_PATH}
+```
+
+### Key environment variables in containers
+
+The following env vars are set in the deployment manifests to ensure proper CUDA operation:
+
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| `NVIDIA_VISIBLE_DEVICES` | `all` | Expose all GPUs to container |
+| `NVIDIA_DRIVER_CAPABILITIES` | `compute,utility` | Enable compute + nvidia-smi |
+| `CUDA_HOME` | `/usr/local/cuda-XX.X` | CUDA toolkit path |
+| `LD_LIBRARY_PATH` | `/usr/local/cuda-XX.X/lib64:...` | Library search path (compat libs loaded first) |
+
+### Host requirements
+
+- NVIDIA Driver >= 520 (for CUDA 11.8 compat) — current host has 560.35.03
+- `nvidia-container-toolkit` configured with `disable-require = false` (default)
+- `nvidia-persistenced` service active for stable GPU state
+
 ## Notes
 
 - **Single-node**: The control-plane taint is removed to allow workloads on the master node.

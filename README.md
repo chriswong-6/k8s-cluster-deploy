@@ -48,13 +48,19 @@ conda init
 conda env create -f configs/environment.yml
 conda activate cluster
 
-# 5. Install CARLA (not available on PyPI, installed separately)
+# 5. Install CARLA (not available on PyPI, requires setuptools 41 for easy_install)
+pip install setuptools==41.0.0
 bash configs/setup_carla.sh
 easy_install carla/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
 
 # 6. Deploy K8s cluster
 sudo ./deploy.sh
 ```
+
+> After installing CARLA, you can restore setuptools to the latest version:
+> ```bash
+> pip install --upgrade setuptools
+> ```
 
 Key packages included: PyTorch 1.13.1, torchvision 0.14.1, carla 0.9.10, opencv, and more. See `configs/environment.yml` for the complete list.
 

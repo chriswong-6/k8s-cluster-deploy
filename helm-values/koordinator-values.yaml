@@ -90,6 +90,9 @@ koordlet:
     requests:
       cpu: "0"
       memory: "0"
+  extraArgs:
+    feature-gates: "BECPUEvict=true,BEMemoryEvict=true,CgroupReconcile=true,Accelerators=true,GPUEnvInject=true"
+  runtimeClassName: nvidia
 
 webhookConfiguration:
   failurePolicy:

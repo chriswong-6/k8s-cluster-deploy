@@ -26,6 +26,33 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 - **CPU**: 4+ cores recommended
 - **Disk**: 100GB+ free space
 - **Network**: Internet access for pulling images
+## Conda Environment Setup
+
+The project applications depend on a Python 3.7 conda environment (`interfuser`). The full environment specification is exported in `configs/environment.yml`.
+
+```bash
+# 1. Install Miniconda (if not already installed)
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+
+# 2. Create the environment from the exported file
+conda env create -f configs/environment.yml
+
+# 3. Activate
+conda activate interfuser
+```
+
+Key packages included: PyTorch 1.9.1+cu111, torchvision 0.10.1, transformers, carla 0.9.10, opencv, timm, mmcv/mmdet, and more. See `configs/environment.yml` for the complete list.
+
+If you encounter dependency conflicts (e.g. on a different OS/architecture), you can create a minimal environment and install the core packages manually:
+
+```bash
+conda create -n interfuser python=3.7 -y
+conda activate interfuser
+pip install torch==1.9.1+cu111 torchvision==0.10.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+pip install transformers datasets opencv-python-headless timm mmcv-full mmdet
+```
 
 ## Quick Start
 
@@ -154,33 +181,6 @@ k8s-cluster-deploy/
     └── calico.yaml
 ```
 
-## Conda Environment Setup
-
-The project applications depend on a Python 3.7 conda environment (`interfuser`). The full environment specification is exported in `configs/environment.yml`.
-
-```bash
-# 1. Install Miniconda (if not already installed)
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
-eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
-
-# 2. Create the environment from the exported file
-conda env create -f configs/environment.yml
-
-# 3. Activate
-conda activate interfuser
-```
-
-Key packages included: PyTorch 1.9.1+cu111, torchvision 0.10.1, transformers, carla 0.9.10, opencv, timm, mmcv/mmdet, and more. See `configs/environment.yml` for the complete list.
-
-If you encounter dependency conflicts (e.g. on a different OS/architecture), you can create a minimal environment and install the core packages manually:
-
-```bash
-conda create -n interfuser python=3.7 -y
-conda activate interfuser
-pip install torch==1.9.1+cu111 torchvision==0.10.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
-pip install transformers datasets opencv-python-headless timm mmcv-full mmdet
-```
 
 ## Notes
 

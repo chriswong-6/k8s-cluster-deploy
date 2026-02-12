@@ -1,0 +1,18 @@
+# Sensitive configuration
+.env
+*.secret
+*.key
+*.pem
+
+# Runtime files
+*.log
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

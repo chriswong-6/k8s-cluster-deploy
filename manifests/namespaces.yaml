@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openfaas
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openfaas-fn
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: akash-services
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: koordinator-system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: local-path-storage
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lease
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nim-service

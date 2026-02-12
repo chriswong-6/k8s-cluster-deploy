@@ -1,0 +1,36 @@
+# OpenFaaS 14.2.103 Helm Values
+# Deployed with default values (no user overrides)
+
+# Gateway configuration
+gateway:
+  nodePort: 31112
+  readTimeout: 1m05s
+  writeTimeout: 1m05s
+  upstreamTimeout: 1m
+  replicas: 1
+  scaleFromZero: true
+
+# Enable basic auth (default)
+basic_auth: true
+generateBasicAuth: true
+
+# Service type
+serviceType: NodePort
+
+# Function namespace
+functionNamespace: openfaas-fn
+
+# Async invocations
+async: true
+
+# Autoscaler
+autoscaler:
+  enabled: true
+
+# Prometheus (bundled)
+prometheus:
+  create: true
+
+# Alertmanager (bundled)
+alertmanager:
+  create: true

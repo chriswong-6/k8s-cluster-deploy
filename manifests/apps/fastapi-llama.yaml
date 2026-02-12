@@ -1,0 +1,118 @@
+# fastapi-llama - GPU-accelerated FastAPI LLM service
+# NOTE: Image 'fastapi-llama:abc' is a local image. You must either:
+#   1. Build it locally on the target host (if Dockerfile is available)
+#   2. Push to a container registry and update the image reference below
+#   3. Use 'ctr -n k8s.io images import' to import a pre-exported image
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fastapi-llama
+  name: fastapi-llama
+  namespace: openfaas-fn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-llama
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8000"
+        prometheus.io/scheme: http
+        prometheus.io/scrape: "true"
+      labels:
+        app: fastapi-llama
+        koordinator.sh/gpu-isolation-provider: HAMi-core
+    spec:
+      hostIPC: true
+      runtimeClassName: nvidia
+      schedulerName: koord-scheduler
+      containers:
+        - name: fastapi-llama
+          image: fastapi-llama:abc
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: hf-token
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: PYTHONPATH
+              value: /home/app/python
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: compute,utility
+            - name: CUDA_HOME
+              value: /usr/local/cuda-12.6
+            - name: LD_LIBRARY_PATH
+              value: /usr/local/cuda-12.6/lib64:/usr/lib/x86_64-linux-gnu
+            - name: HF_HOME
+              value: /home/app/huggingface
+            - name: TRANSFORMERS_CACHE
+              value: /home/app/huggingface/transformers
+          resources:
+            requests:
+              cpu: "4"
+              memory: 8Gi
+              koordinator.sh/gpu-core: "30"
+              koordinator.sh/gpu-memory-ratio: "30"
+              koordinator.sh/gpu.shared: "1"
+            limits:
+              cpu: "4"
+              memory: 8Gi
+              koordinator.sh/gpu-core: "30"
+              koordinator.sh/gpu-memory-ratio: "30"
+              koordinator.sh/gpu.shared: "1"
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            capabilities:
+              add:
+                - IPC_LOCK
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: fastapi-llama
+  name: fastapi-llama-service
+  namespace: openfaas-fn
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      nodePort: 30800
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app: fastapi-llama
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastapi-llama-ingress
+  namespace: openfaas-fn
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: fastapi-llama.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fastapi-llama-service
+                port:
+                  number: 8000

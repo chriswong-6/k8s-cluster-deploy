@@ -1,0 +1,10 @@
+# local-path-provisioner Helm Values
+
+storageClass:
+  name: local-path
+  reclaimPolicy: Delete
+
+nodePathMap:
+  - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
+    paths:
+      - /opt/local-path-provisioner

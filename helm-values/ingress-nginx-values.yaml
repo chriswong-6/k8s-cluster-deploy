@@ -1,0 +1,27 @@
+# ingress-nginx 4.8.3 Helm Values
+# Configured for Akash Provider integration
+
+controller:
+  kind: DaemonSet
+  hostPort:
+    enabled: true
+    ports:
+      http: 80
+      https: 443
+  service:
+    type: ClusterIP
+  ingressClassResource:
+    name: akash-ingress-class
+  config:
+    allow-snippet-annotations: "false"
+    compute-full-forwarded-for: "true"
+    proxy-buffer-size: 16k
+  extraArgs:
+    enable-ssl-passthrough: true
+  admissionWebhooks:
+    port: 7443
+
+# TCP services passthrough for Akash Provider
+tcp:
+  "8443": akash-services/akash-provider:8443
+  "8444": akash-services/akash-provider:8444

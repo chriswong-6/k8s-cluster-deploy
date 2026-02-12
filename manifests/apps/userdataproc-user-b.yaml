@@ -1,0 +1,93 @@
+# userdataproc-user-b - User data processing function (User B)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    faas_function: userdataproc-user-b
+  name: userdataproc-user-b
+  namespace: openfaas-fn
+  annotations:
+    prometheus.io.scrape: "false"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      faas_function: userdataproc-user-b
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      annotations:
+        prometheus.io.scrape: "false"
+      labels:
+        faas_function: userdataproc-user-b
+        com.openfaas.scale.min: "0"
+        com.openfaas.scale.max: "1"
+      name: userdataproc-user-b
+    spec:
+      containers:
+        - name: userdataproc-user-b
+          image: avhub2025/userdataproc:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: compute,utility
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: USER_ID
+              value: user_b
+            - name: cgi_headers
+              value: "true"
+            - name: fprocess
+              value: python3 index.py
+            - name: mode
+              value: http
+            - name: upstream_url
+              value: http://127.0.0.1:5000
+            - name: write_debug
+              value: "true"
+          livenessProbe:
+            httpGet:
+              path: /_/health
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            timeoutSeconds: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /_/health
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+          securityContext:
+            readOnlyRootFilesystem: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userdataproc-user-b
+  namespace: openfaas-fn
+  annotations:
+    prometheus.io.scrape: "false"
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    faas_function: userdataproc-user-b

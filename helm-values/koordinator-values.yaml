@@ -1,0 +1,100 @@
+# Koordinator v1.6.0 Helm Values
+# Uses Chinese mirror registry (registry.cn-beijing.aliyuncs.com) by default.
+# To use international mirrors, set imageRepositoryHost to "" or a public registry.
+
+imageRepositoryHost: registry.cn-beijing.aliyuncs.com
+
+installation:
+  namespace: koordinator-system
+  roleListGroups:
+    - '*'
+
+featureGates: ""
+
+crds:
+  managed: true
+  devices: true
+  clustercolocationprofiles: true
+  elasticquotaprofiles: true
+  elasticquotas: true
+  nodemetrics: true
+  noderesourcetopologies: true
+  nodeslos: true
+  podgroups: true
+  podmigrationjobs: true
+  recommendations: true
+  reservations: true
+
+manager:
+  replicas: 2
+  hostNetwork: false
+  image:
+    repository: koordinator-sh/koord-manager
+    tag: v1.6.0
+  log:
+    level: "4"
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 256Mi
+  webhook:
+    port: 9876
+
+scheduler:
+  replicas: 2
+  hostNetwork: false
+  image:
+    repository: koordinator-sh/koord-scheduler
+    tag: v1.6.0
+  log:
+    level: "4"
+  port: 10251
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 256Mi
+
+descheduler:
+  replicas: 2
+  hostNetwork: false
+  image:
+    repository: koordinator-sh/koord-descheduler
+    tag: v1.6.0
+  log:
+    level: "4"
+  port: 10251
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 256Mi
+
+koordlet:
+  image:
+    repository: koordinator-sh/koordlet
+    tag: v1.6.0
+  log:
+    level: "4"
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: "0"
+      memory: "0"
+
+webhookConfiguration:
+  failurePolicy:
+    pods: Ignore
+    nodes: Ignore
+    nodeStatus: Ignore
+    elasticquotas: Ignore
+  timeoutSeconds: 30

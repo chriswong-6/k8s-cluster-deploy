@@ -1,0 +1,10 @@
+# Calico v3.27.2 Installation Manifest
+# This file is downloaded during deployment from the official Calico release.
+# The deploy script will fetch the latest v3.27.x manifest automatically.
+#
+# Source: https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/calico.yaml
+#
+# The CALICO_IPV4POOL_CIDR must match the podSubnet in kubeadm-config.yaml (172.16.0.0/16)
+#
+# NOTE: This is a placeholder. The actual manifest (~4000 lines) is downloaded
+# during deployment by scripts/03-install-calico.sh

@@ -1,0 +1,13 @@
+# Akash Provider 14.0.6 Helm Values
+# IMPORTANT: Sensitive values use placeholders - configure in .env file
+
+chainid: local-test
+domain: ${AKASH_DOMAIN}
+email: ${AKASH_EMAIL}
+from: ${AKASH_FROM}
+node: ${AKASH_NODE}
+
+# Base64-encoded private key and key secret
+# Generate from your Akash wallet
+key: ${AKASH_KEY}
+keysecret: ${AKASH_KEY_SECRET}

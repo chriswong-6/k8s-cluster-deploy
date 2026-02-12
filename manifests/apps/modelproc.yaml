@@ -1,0 +1,91 @@
+# modelproc - GPU model processing service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: modelproc
+  name: modelproc
+  namespace: openfaas-fn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: modelproc
+  template:
+    metadata:
+      labels:
+        app: modelproc
+        koordinator.sh/gpu-isolation-provider: HAMi-core
+    spec:
+      hostIPC: true
+      runtimeClassName: nvidia
+      schedulerName: koord-scheduler
+      containers:
+        - name: modelproc
+          image: avhub2025/fastapi-llama:latest
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c"]
+          args: ["ulimit -l unlimited && python3 index.py"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: mode
+              value: http
+            - name: write_debug
+              value: "true"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: cgi_headers
+              value: "true"
+            - name: upstream_url
+              value: http://127.0.0.1:5050
+            - name: read_timeout
+              value: 60s
+            - name: write_timeout
+              value: 60s
+            - name: combine_output
+              value: "false"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: compute,utility
+            - name: CUDA_HOME
+              value: /usr/local/cuda-11.8
+            - name: LD_LIBRARY_PATH
+              value: /usr/local/cuda-11.8/lib64:/usr/lib/x86_64-linux-gnu
+          resources:
+            requests:
+              cpu: "6"
+              memory: 8Gi
+              koordinator.sh/gpu-core: "40"
+              koordinator.sh/gpu-memory-ratio: "40"
+              koordinator.sh/gpu.shared: "1"
+            limits:
+              cpu: "6"
+              memory: 8Gi
+              koordinator.sh/gpu-core: "40"
+              koordinator.sh/gpu-memory-ratio: "40"
+              koordinator.sh/gpu.shared: "1"
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            capabilities:
+              add:
+                - IPC_LOCK
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: modelproc
+  name: modelproc
+  namespace: openfaas-fn
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 5050
+  selector:
+    app: modelproc

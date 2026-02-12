@@ -1,0 +1,23 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: "0.0.0.0"
+nodeRegistration:
+  criSocket: unix:///run/containerd/containerd.sock
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: v1.28.15
+imageRepository: registry.k8s.io
+networking:
+  podSubnet: 172.16.0.0/16
+  serviceSubnet: 10.96.0.0/12
+  dnsDomain: cluster.local
+apiServer:
+  extraArgs:
+    authorization-mode: Node,RBAC
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes

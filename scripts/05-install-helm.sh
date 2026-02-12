@@ -22,7 +22,7 @@ helm repo add koordinator-sh https://koordinator-sh.github.io/charts 2>/dev/null
 helm repo add openfaas https://openfaas.github.io/faas-netes 2>/dev/null || true
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 2>/dev/null || true
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx 2>/dev/null || true
-helm repo add akash https://ovrclk.github.io/helm-charts 2>/dev/null || true
+helm repo add akash https://akash-network.github.io/helm-charts 2>/dev/null || true
 
 log_info "Updating Helm repositories..."
 helm repo update

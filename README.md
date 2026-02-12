@@ -34,34 +34,26 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 git clone https://github.com/chriswong-6/k8s-cluster-deploy.git
 cd k8s-cluster-deploy
 
-# 2. Configure environment
+# 2. Configure environment variables
 cp .env.example .env
 nano .env  # Fill in your values (HF_TOKEN, etc.)
 
-# 3. Deploy everything
-sudo ./deploy.sh
-```
-
-## Conda Environment Setup
-
-The project applications depend on a Python 3.7 conda environment (`cluster`). The full environment specification is exported in `configs/environment.yml`.
-
-```bash
-# 1. Install Anaconda (if not already installed)
+# 3. Install Anaconda (if not already installed)
 wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
 bash Anaconda3-2024.10-1-Linux-x86_64.sh -b -p $HOME/anaconda3
 eval "$($HOME/anaconda3/bin/conda shell.bash hook)"
 conda init
 
-# 2. Create the environment from the exported file
+# 4. Create and activate conda environment
 conda env create -f configs/environment.yml
-
-# 3. Activate
 conda activate cluster
 
-# 4. Install CARLA (not available on PyPI, installed separately)
+# 5. Install CARLA (not available on PyPI, installed separately)
 bash configs/setup_carla.sh
 easy_install carla/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
+
+# 6. Deploy K8s cluster
+sudo ./deploy.sh
 ```
 
 Key packages included: PyTorch 1.13.1, torchvision 0.14.1, carla 0.9.10, opencv, and more. See `configs/environment.yml` for the complete list.

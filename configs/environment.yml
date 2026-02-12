@@ -1,4 +1,4 @@
-name: interfuser
+name: cluster
 channels:
   - defaults
   - https://repo.anaconda.com/pkgs/main
@@ -31,7 +31,7 @@ dependencies:
       - backcall==0.1.0
       - bleach==3.1.4
       - cachetools==4.0.0
-      - carla==0.9.10
+      # carla==0.9.10 -- install separately, see README (not on PyPI for py3.7)
       - carla-birdeye-view==1.1.1
       - certifi==2025.8.3
       - chardet==3.0.4
@@ -161,4 +161,4 @@ dependencies:
       - xxhash==3.6.0
       - yarl==1.9.4
       - zipp==3.1.0
-prefix: /home/lmdrive/anaconda3/envs/interfuser
+prefix: /home/lmdrive/anaconda3/envs/cluster

@@ -29,7 +29,7 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 
 ## Conda Environment Setup
 
-The project applications depend on a Python 3.7 conda environment (`interfuser`). The full environment specification is exported in `configs/environment.yml`.
+The project applications depend on a Python 3.7 conda environment (`cluster`). The full environment specification is exported in `configs/environment.yml`.
 
 ```bash
 # 1. Install Anaconda (if not already installed)
@@ -43,18 +43,24 @@ conda env create -f configs/environment.yml
 
 # 3. Activate
 conda activate cluster
+
+# 4. Install CARLA (not available on PyPI, installed separately)
+bash configs/setup_carla.sh
+easy_install carla/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
 ```
 
-Key packages included: PyTorch 1.9.1+cu111, torchvision 0.10.1, transformers, carla 0.9.10, opencv, timm, mmcv/mmdet, and more. See `configs/environment.yml` for the complete list.
+Key packages included: PyTorch 1.13.1, torchvision 0.14.1, carla 0.9.10, opencv, and more. See `configs/environment.yml` for the complete list.
 
-If you encounter dependency conflicts (e.g. on a different OS/architecture), you can create a minimal environment and install the core packages manually:
+If you encounter dependency conflicts (e.g. on a different OS/architecture), you can create a minimal environment with PTX-compatible CUDA 11.1 packages:
 
 ```bash
-conda create -n interfuser python=3.7 -y
-conda activate interfuser
+conda create -n cluster python=3.7 -y
+conda activate cluster
 pip install torch==1.9.1+cu111 torchvision==0.10.1+cu111 -f https://download.pytorch.org/whl/torch_stable.html
 pip install transformers datasets opencv-python-headless timm mmcv-full mmdet
 ```
+
+> **Note**: The `cu111` builds use PTX JIT compilation, allowing them to run on newer GPUs (e.g. RTX 4090 with CUDA 12.6) via NVIDIA Forward Compatibility. See [CUDA Forward Compatibility](#cuda-forward-compatibility-ptx-jit) section below.
 
 ## Quick Start
 

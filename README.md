@@ -42,7 +42,7 @@ conda init
 conda env create -f configs/environment.yml
 
 # 3. Activate
-conda activate interfuser
+conda activate cluster
 ```
 
 Key packages included: PyTorch 1.9.1+cu111, torchvision 0.10.1, transformers, carla 0.9.10, opencv, timm, mmcv/mmdet, and more. See `configs/environment.yml` for the complete list.

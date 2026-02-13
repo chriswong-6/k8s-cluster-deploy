@@ -73,6 +73,41 @@ Key packages included: PyTorch 1.13.1, torchvision 0.14.1, carla 0.9.10, opencv,
 > ```
 > The `cu111` builds use PTX JIT compilation, allowing them to run on newer GPUs (e.g. RTX 4090 with CUDA 12.6) via NVIDIA Forward Compatibility. See [CUDA Forward Compatibility](#cuda-forward-compatibility-ptx-jit) section below.
 
+## Akash Provider Setup (Optional)
+
+If you want to join the Akash decentralized compute network as a Provider, you need to create your own wallet and keys before configuring `.env`.
+
+```bash
+# 1. Install Akash CLI
+curl -sSfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | sh
+
+# 2. Create a new wallet (save the mnemonic!)
+akash keys add my-provider --keyring-backend file
+
+# 3. Export the private key to a file
+akash keys export my-provider --keyring-backend file > key.txt
+# You will be prompted to set an export password — this becomes your AKASH_KEY_SECRET
+
+# 4. Base64-encode the key file for .env
+cat key.txt | base64 -w 0
+# Copy this output as your AKASH_KEY value in .env
+
+# 5. Get your wallet address for AKASH_FROM
+akash keys show my-provider -a --keyring-backend file
+
+# 6. Create the K8s secret after deploying (automatically handled by deploy.sh)
+# The deploy script reads AKASH_KEY and AKASH_KEY_SECRET from .env
+# and creates the akash-provider-keys secret in the cluster
+```
+
+Fill in the following in your `.env`:
+- `AKASH_KEY` — Base64-encoded content of `key.txt`
+- `AKASH_KEY_SECRET` — The export password you set in step 3 (plain text)
+- `AKASH_FROM` — Your wallet address from step 5
+- `AKASH_DOMAIN` — Your provider domain (e.g. `akash-provider.duckdns.org`)
+- `AKASH_NODE` — Chain node RPC URL (e.g. `http://192.168.50.8:26657`)
+- `AKASH_EMAIL` — Your contact email
+
 ## Configuration
 
 Copy `.env.example` to `.env` and configure:

@@ -144,6 +144,16 @@ if [ "$DEPLOY_AKASH" = "true" ]; then
         fi
     done
 
+    # Create akash-provider-keys secret from .env values
+    if ! kubectl get secret akash-provider-keys -n akash-services &>/dev/null; then
+        log_info "Creating akash-provider-keys secret..."
+        kubectl create secret generic akash-provider-keys \
+            -n akash-services \
+            --from-literal=key.txt="$(echo "${AKASH_KEY}" | base64 -d)" \
+            --from-literal=key-pass.txt="${AKASH_KEY_SECRET}"
+        log_success "akash-provider-keys secret created."
+    fi
+
     # Render Akash provider values
     AKASH_VALUES="/tmp/akash-provider-values-rendered.yaml"
     envsubst < "${PROJECT_ROOT}/helm-values/akash-provider-values.yaml" > "$AKASH_VALUES"

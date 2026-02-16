@@ -244,15 +244,19 @@ The `fastapi-llama:abc` image is built locally and NOT available from any regist
 ## Uninstall
 
 ```bash
-# Remove applications only
+# Remove applications only (Deployments, Services, Secrets)
 sudo ./uninstall.sh --apps-only
 
-# Remove all Helm components
+# Remove all Helm releases + CRDs + PVCs + namespaces
 sudo ./uninstall.sh
 
-# Full teardown (including kubeadm reset)
+# Full teardown: K8s + containerd + NVIDIA drivers + Helm + all data
+# Removes everything installed by deploy.sh — system returns to bare metal state
 sudo ./uninstall.sh --full
+# Reboot recommended after --full
 ```
+
+The `--full` flag removes: Kubernetes (kubeadm, kubelet, kubectl), containerd, NVIDIA drivers + container toolkit + MPS, Helm, all CRDs (Akash, Prometheus, Koordinator), PVCs, CNI configs, iptables rules, and cached data.
 
 ## Verification
 

@@ -34,26 +34,29 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 git clone https://github.com/chriswong-6/k8s-cluster-deploy.git
 cd k8s-cluster-deploy
 
-# 2. Configure environment variables
-cp .env.example .env
-nano .env  # Fill in your values (HF_TOKEN, etc.)
+# 2. (Optional) Set up Akash Provider wallet — see "Akash Provider Setup" below
+#    Complete this BEFORE step 3 if you want to deploy Akash
 
-# 3. Install Anaconda (if not already installed)
+# 3. Configure environment variables
+cp .env.example .env
+nano .env  # Fill in your values (HF_TOKEN, Akash keys, etc.)
+
+# 4. Install Anaconda (if not already installed)
 wget https://repo.anaconda.com/archive/Anaconda3-2024.10-1-Linux-x86_64.sh
 bash Anaconda3-2024.10-1-Linux-x86_64.sh -b -p $HOME/anaconda3
 eval "$($HOME/anaconda3/bin/conda shell.bash hook)"
 conda init
 
-# 4. Create and activate conda environment
+# 5. Create and activate conda environment
 conda env create -f configs/environment.yml
 conda activate cluster
 
-# 5. Install CARLA (not available on PyPI, requires setuptools 41 for easy_install)
+# 6. Install CARLA (not available on PyPI, requires setuptools 41 for easy_install)
 pip install setuptools==41.0.0
 bash configs/setup_carla.sh
 easy_install carla/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg
 
-# 6. Deploy K8s cluster
+# 7. Deploy K8s cluster
 sudo ./deploy.sh
 ```
 

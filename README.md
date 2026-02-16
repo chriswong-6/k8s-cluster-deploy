@@ -84,8 +84,12 @@ If you want to join the Akash decentralized compute network as a Provider, you n
 
 ```bash
 # Install Akash Provider Services CLI
+# Option A: Latest version (requires Ubuntu 24.04 / glibc >= 2.38)
 curl -sSfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | sh
-# This installs ./bin/provider-services
+
+# Option B: For Ubuntu 22.04 (glibc 2.35) — use v0.6.4
+curl -L https://github.com/akash-network/provider/releases/download/v0.6.4/provider-services_0.6.4_linux_amd64.zip -o /tmp/ps.zip
+unzip -o /tmp/ps.zip -d ./bin/ && chmod +x ./bin/provider-services
 
 # Create a new wallet (save the mnemonic!)
 ./bin/provider-services keys add my-provider --keyring-backend file

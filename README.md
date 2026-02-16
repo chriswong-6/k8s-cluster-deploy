@@ -251,12 +251,19 @@ sudo ./uninstall.sh --apps-only
 sudo ./uninstall.sh
 
 # Full teardown: K8s + containerd + NVIDIA drivers + Helm + all data
-# Removes everything installed by deploy.sh — system returns to bare metal state
 sudo ./uninstall.sh --full
+
+# Full teardown but keep NVIDIA drivers installed
+sudo ./uninstall.sh --full --keep-nvidia
 # Reboot recommended after --full
 ```
 
-The `--full` flag removes: Kubernetes (kubeadm, kubelet, kubectl), containerd, NVIDIA drivers + container toolkit + MPS, Helm, all CRDs (Akash, Prometheus, Koordinator), PVCs, CNI configs, iptables rules, and cached data.
+| Flag | Removes |
+|------|---------|
+| `--apps-only` | Custom applications (Deployments, Services, Secrets) |
+| *(no flag)* | Helm releases + CRDs + PVCs + namespaces |
+| `--full` | All above + K8s packages + containerd + NVIDIA drivers/toolkit + Helm + data |
+| `--full --keep-nvidia` | Same as `--full` but keeps NVIDIA drivers (only removes container toolkit) |
 
 ## Verification
 

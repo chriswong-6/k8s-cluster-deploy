@@ -5,6 +5,7 @@
 #   sudo ./uninstall.sh               # Remove Helm releases + applications
 #   sudo ./uninstall.sh --apps-only   # Only remove custom applications
 #   sudo ./uninstall.sh --full        # Full teardown: K8s + drivers + packages
+#   sudo ./uninstall.sh --full --keep-nvidia  # Full teardown but keep NVIDIA drivers
 #
 set -euo pipefail
 
@@ -13,6 +14,7 @@ source "${SCRIPT_DIR}/scripts/utils.sh"
 
 APPS_ONLY=false
 FULL_RESET=false
+KEEP_NVIDIA=false
 
 for arg in "$@"; do
     case $arg in
@@ -22,13 +24,17 @@ for arg in "$@"; do
         --full)
             FULL_RESET=true
             ;;
+        --keep-nvidia)
+            KEEP_NVIDIA=true
+            ;;
         --help|-h)
             echo "Usage: sudo ./uninstall.sh [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  --apps-only   Only remove custom applications"
-            echo "  --full        Full teardown: K8s + drivers + packages"
-            echo "  --help, -h    Show this help message"
+            echo "  --apps-only     Only remove custom applications"
+            echo "  --full          Full teardown: K8s + drivers + packages"
+            echo "  --keep-nvidia   With --full: keep NVIDIA drivers installed"
+            echo "  --help, -h      Show this help message"
             exit 0
             ;;
     esac
@@ -162,7 +168,7 @@ if [ "$FULL_RESET" = true ]; then
     rm -rf "$HOME/.kube/config"
     rm -rf /etc/kubernetes/
 
-    # --- Stop and remove NVIDIA MPS ---
+    # --- NVIDIA MPS ---
     log_info "Stopping NVIDIA MPS..."
     systemctl stop nvidia-mps.service 2>/dev/null || true
     systemctl disable nvidia-mps.service 2>/dev/null || true
@@ -192,20 +198,25 @@ if [ "$FULL_RESET" = true ]; then
     rm -f /etc/apt/keyrings/docker.gpg 2>/dev/null || true
 
     # --- Remove NVIDIA drivers and container toolkit ---
-    log_info "Removing NVIDIA Container Toolkit..."
-    apt-get purge -y nvidia-container-toolkit 2>/dev/null || true
-    rm -f /etc/apt/sources.list.d/nvidia-container-toolkit.list 2>/dev/null || true
+    if [ "$KEEP_NVIDIA" = true ]; then
+        log_info "Keeping NVIDIA drivers (--keep-nvidia). Only removing container toolkit..."
+        apt-get purge -y nvidia-container-toolkit 2>/dev/null || true
+        rm -f /etc/apt/sources.list.d/nvidia-container-toolkit.list 2>/dev/null || true
+    else
+        log_info "Removing NVIDIA Container Toolkit..."
+        apt-get purge -y nvidia-container-toolkit 2>/dev/null || true
+        rm -f /etc/apt/sources.list.d/nvidia-container-toolkit.list 2>/dev/null || true
 
-    log_info "Removing NVIDIA drivers..."
-    apt-get purge -y 'nvidia-driver-*' 'libnvidia-*' 'nvidia-utils-*' 2>/dev/null || true
-    apt-get purge -y 'cuda-*' 'nvidia-cuda-*' 2>/dev/null || true
-    apt-get autoremove -y 2>/dev/null || true
-    rm -rf /usr/local/cuda* 2>/dev/null || true
-    rm -f /etc/apt/sources.list.d/cuda*.list 2>/dev/null || true
+        log_info "Removing NVIDIA drivers..."
+        apt-get purge -y 'nvidia-driver-*' 'libnvidia-*' 'nvidia-utils-*' 2>/dev/null || true
+        apt-get purge -y 'cuda-*' 'nvidia-cuda-*' 2>/dev/null || true
+        apt-get autoremove -y 2>/dev/null || true
+        rm -rf /usr/local/cuda* 2>/dev/null || true
+        rm -f /etc/apt/sources.list.d/cuda*.list 2>/dev/null || true
 
-    # Reload to remove nvidia kernel modules
-    log_info "Removing NVIDIA kernel modules..."
-    rmmod nvidia_uvm nvidia_drm nvidia_modeset nvidia 2>/dev/null || true
+        log_info "Removing NVIDIA kernel modules..."
+        rmmod nvidia_uvm nvidia_drm nvidia_modeset nvidia 2>/dev/null || true
+    fi
 
     # --- Final cleanup ---
     log_info "Running final apt cleanup..."

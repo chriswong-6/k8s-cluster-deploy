@@ -135,6 +135,11 @@ log_success "kube-prometheus-stack deployed."
 if [ "$DEPLOY_AKASH" = "true" ]; then
     log_info "--- Deploying Akash Provider ---"
 
+    # Apply Akash CRDs (not included in Helm chart)
+    log_info "Applying Akash CRDs..."
+    kubectl apply -f "${PROJECT_ROOT}/manifests/akash-crds/akash-crds.yaml"
+    log_success "Akash CRDs applied."
+
     # Validate required Akash env vars
     for var in AKASH_KEY AKASH_KEY_SECRET AKASH_DOMAIN AKASH_NODE AKASH_FROM AKASH_EMAIL; do
         if [ -z "${!var:-}" ]; then

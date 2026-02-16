@@ -1,0 +1,521 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  name: manifests.akash.network
+spec:
+  group: akash.network
+  names:
+    kind: Manifest
+    plural: manifests
+    shortNames:
+    - mani
+    singular: manifest
+  scope: Namespaced
+  versions:
+  - name: v2beta2
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              group:
+                properties:
+                  name:
+                    type: string
+                  services:
+                    items:
+                      properties:
+                        args:
+                          items:
+                            type: string
+                          type: array
+                        command:
+                          items:
+                            type: string
+                          type: array
+                        count:
+                          format: uint64
+                          type: number
+                        credentials:
+                          nullable: true
+                          properties:
+                            email:
+                              type: string
+                            host:
+                              type: string
+                            password:
+                              type: string
+                            username:
+                              type: string
+                          type: object
+                        env:
+                          items:
+                            type: string
+                          type: array
+                        expose:
+                          items:
+                            properties:
+                              endpoint_sequence_number:
+                                format: uint32
+                                type: number
+                              external_port:
+                                format: uint16
+                                type: integer
+                              global:
+                                type: boolean
+                              hosts:
+                                items:
+                                  type: string
+                                type: array
+                              http_options:
+                                properties:
+                                  max_body_size:
+                                    type: integer
+                                  next_cases:
+                                    items:
+                                      type: string
+                                    type: array
+                                  next_timeout:
+                                    type: integer
+                                  next_tries:
+                                    type: integer
+                                  read_timeout:
+                                    type: integer
+                                  send_timeout:
+                                    type: integer
+                                type: object
+                              ip:
+                                type: string
+                              port:
+                                format: uint16
+                                type: integer
+                              proto:
+                                type: string
+                              service:
+                                type: string
+                            type: object
+                          type: array
+                        image:
+                          type: string
+                        name:
+                          type: string
+                        params:
+                          nullable: true
+                          properties:
+                            storage:
+                              items:
+                                properties:
+                                  mount:
+                                    type: string
+                                  name:
+                                    type: string
+                                  readOnly:
+                                    type: boolean
+                                type: object
+                              type: array
+                          type: object
+                        resources:
+                          properties:
+                            cpu:
+                              properties:
+                                attributes:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      value:
+                                        type: string
+                                    type: object
+                                  nullable: true
+                                  type: array
+                                units:
+                                  format: uint32
+                                  type: number
+                              type: object
+                            gpu:
+                              properties:
+                                attributes:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      value:
+                                        type: string
+                                    type: object
+                                  nullable: true
+                                  type: array
+                                units:
+                                  format: uint32
+                                  type: number
+                              type: object
+                            id:
+                              format: uint32
+                              type: number
+                            memory:
+                              properties:
+                                attributes:
+                                  items:
+                                    properties:
+                                      key:
+                                        type: string
+                                      value:
+                                        type: string
+                                    type: object
+                                  nullable: true
+                                  type: array
+                                size:
+                                  format: uint64
+                                  type: string
+                              type: object
+                            storage:
+                              items:
+                                properties:
+                                  attributes:
+                                    items:
+                                      properties:
+                                        key:
+                                          type: string
+                                        value:
+                                          type: string
+                                      type: object
+                                    nullable: true
+                                    type: array
+                                  name:
+                                    type: string
+                                  size:
+                                    format: uint64
+                                    type: string
+                                type: object
+                              type: array
+                          type: object
+                        scheduler_params:
+                          nullable: true
+                          properties:
+                            resources:
+                              nullable: true
+                              properties:
+                                gpu:
+                                  nullable: true
+                                  properties:
+                                    interface:
+                                      type: string
+                                    memory_size:
+                                      format: uint64
+                                      type: string
+                                    model:
+                                      type: string
+                                    vendor:
+                                      type: string
+                                  type: object
+                              type: object
+                            runtime_class:
+                              type: string
+                          type: object
+                      type: object
+                    type: array
+                type: object
+              lease_id:
+                properties:
+                  dseq:
+                    format: uint64
+                    type: string
+                  gseq:
+                    type: integer
+                  oseq:
+                    type: integer
+                  owner:
+                    type: string
+                  provider:
+                    type: string
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+  - name: v2beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              group:
+                properties:
+                  name:
+                    type: string
+                  services:
+                    items:
+                      properties:
+                        args:
+                          items:
+                            type: string
+                          type: array
+                        command:
+                          items:
+                            type: string
+                          type: array
+                        count:
+                          format: uint64
+                          type: number
+                        env:
+                          items:
+                            type: string
+                          type: array
+                        expose:
+                          items:
+                            properties:
+                              endpoint_sequence_number:
+                                format: uint32
+                                type: number
+                              external_port:
+                                format: uint16
+                                type: integer
+                              global:
+                                type: boolean
+                              hosts:
+                                items:
+                                  type: string
+                                type: array
+                              http_options:
+                                properties:
+                                  max_body_size:
+                                    type: integer
+                                  next_cases:
+                                    items:
+                                      type: string
+                                    type: array
+                                  next_timeout:
+                                    type: integer
+                                  next_tries:
+                                    type: integer
+                                  read_timeout:
+                                    type: integer
+                                  send_timeout:
+                                    type: integer
+                                type: object
+                              ip:
+                                type: string
+                              port:
+                                format: uint16
+                                type: integer
+                              proto:
+                                type: string
+                              service:
+                                type: string
+                            type: object
+                          type: array
+                        image:
+                          type: string
+                        name:
+                          type: string
+                        params:
+                          nullable: true
+                          properties:
+                            storage:
+                              items:
+                                properties:
+                                  mount:
+                                    type: string
+                                  name:
+                                    type: string
+                                  readOnly:
+                                    type: boolean
+                                type: object
+                              type: array
+                          type: object
+                        unit:
+                          properties:
+                            cpu:
+                              format: uint32
+                              type: number
+                            memory:
+                              format: uint64
+                              type: string
+                            storage:
+                              items:
+                                properties:
+                                  name:
+                                    type: string
+                                  size:
+                                    format: uint64
+                                    type: string
+                                type: object
+                              type: array
+                          type: object
+                      type: object
+                    type: array
+                type: object
+              lease_id:
+                properties:
+                  dseq:
+                    format: uint64
+                    type: string
+                  gseq:
+                    type: integer
+                  oseq:
+                    type: integer
+                  owner:
+                    type: string
+                  provider:
+                    type: string
+                type: object
+            type: object
+        type: object
+    served: false
+    storage: false
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  name: providerhosts.akash.network
+spec:
+  group: akash.network
+  names:
+    kind: ProviderHost
+    plural: providerhosts
+    shortNames:
+    - ph
+    singular: providerhost
+  scope: Namespaced
+  versions:
+  - name: v2beta2
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              dseq:
+                type: integer
+              external_port:
+                type: integer
+              gseq:
+                type: integer
+              hostname:
+                type: string
+              oseq:
+                type: integer
+              owner:
+                type: string
+              provider:
+                type: string
+              service_name:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+  - name: v2beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              dseq:
+                type: integer
+              external_port:
+                type: integer
+              gseq:
+                type: integer
+              hostname:
+                type: string
+              oseq:
+                type: integer
+              owner:
+                type: string
+              provider:
+                type: string
+              service_name:
+                type: string
+            type: object
+        type: object
+    served: false
+    storage: false
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  name: providerleasedips.akash.network
+spec:
+  group: akash.network
+  names:
+    kind: ProviderLeasedIP
+    plural: providerleasedips
+    shortNames:
+    - plip
+    singular: providerleasedip
+  scope: Namespaced
+  versions:
+  - name: v2beta2
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              external_port:
+                type: integer
+              lease_id:
+                properties:
+                  dseq:
+                    format: uint64
+                    type: string
+                  gseq:
+                    type: integer
+                  oseq:
+                    type: integer
+                  owner:
+                    type: string
+                  provider:
+                    type: string
+                type: object
+              port:
+                type: integer
+              protocol:
+                type: string
+              service_name:
+                type: string
+              sharing_key:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+  - name: v2beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              external_port:
+                type: integer
+              lease_id:
+                properties:
+                  dseq:
+                    format: uint64
+                    type: string
+                  gseq:
+                    type: integer
+                  oseq:
+                    type: integer
+                  owner:
+                    type: string
+                  provider:
+                    type: string
+                type: object
+              port:
+                type: integer
+              protocol:
+                type: string
+              service_name:
+                type: string
+              sharing_key:
+                type: string
+            type: object
+        type: object
+    served: false
+    storage: false
+

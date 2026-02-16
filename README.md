@@ -77,33 +77,113 @@ Key packages included: PyTorch 1.13.1, torchvision 0.14.1, carla 0.9.10, opencv,
 
 If you want to join the Akash decentralized compute network as a Provider, you need to create your own wallet and keys before configuring `.env`.
 
+### 1. Install CLI & Create Wallet
+
 ```bash
-# 1. Install Akash Provider Services CLI
+# Install Akash Provider Services CLI
 curl -sSfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | sh
 # This installs ./bin/provider-services
 
-# 2. Create a new wallet (save the mnemonic!)
+# Create a new wallet (save the mnemonic!)
 ./bin/provider-services keys add my-provider --keyring-backend file
+```
 
-# 3. Export the private key to a file
+### 2. Fund Your Wallet
+
+Your new wallet needs AKT tokens to pay for on-chain transactions. Transfer AKT from an existing wallet:
+
+```bash
+# From an existing funded wallet (on the chain node machine):
+./bin/provider-services tx bank send <funded-wallet> <new-wallet-address> 10000000uakt \
+  --chain-id local-test \
+  --node http://192.168.50.8:26657 \
+  --keyring-backend test \
+  --fees 5000uakt \
+  --gas 200000 \
+  -y
+
+# Verify balance on the new wallet
+./bin/provider-services query bank balances <new-wallet-address> \
+  --node http://192.168.50.8:26657
+```
+
+> 10000000uakt = 10 AKT. Adjust the amount and `--chain-id` / `--node` for your chain.
+
+### 3. Register Provider On-Chain
+
+```bash
+# Create provider.yaml
+cat > ~/provider.yaml <<'EOF'
+host: https://akash-provider.duckdns.org:8443
+attributes:
+  - key: host
+    value: akash
+  - key: tier
+    value: community
+  - key: organization
+    value: personal
+info:
+  email: your-email@example.com
+  website: ""
+EOF
+
+# Register as a Provider
+./bin/provider-services tx provider create ~/provider.yaml \
+  --from my-provider \
+  --chain-id local-test \
+  --node http://192.168.50.8:26657 \
+  --keyring-backend file \
+  --fees 5000uakt \
+  --gas 300000 \
+  -y
+```
+
+### 4. Generate & Publish Certificate
+
+```bash
+# Generate client certificate
+./bin/provider-services tx cert generate client \
+  --from my-provider \
+  --chain-id local-test \
+  --node http://192.168.50.8:26657 \
+  --keyring-backend file \
+  --fees 5000uakt \
+  --gas 300000 \
+  -y
+
+# Publish certificate to chain
+./bin/provider-services tx cert publish client \
+  --from my-provider \
+  --chain-id local-test \
+  --node http://192.168.50.8:26657 \
+  --keyring-backend file \
+  --fees 5000uakt \
+  --gas 300000 \
+  -y
+```
+
+### 5. Export Key & Configure .env
+
+```bash
+# Export the private key to a file
 # You will be prompted to set an export password — this becomes your AKASH_KEY_SECRET
 ./bin/provider-services keys export my-provider --keyring-backend file > key.txt
 
-# 4. Base64-encode the key file for .env
+# Base64-encode the key file for .env
 cat key.txt | base64 -w 0
 # Copy this output as your AKASH_KEY value in .env
 
-# 5. Get your wallet address for AKASH_FROM
+# Get your wallet address for AKASH_FROM
 ./bin/provider-services keys show my-provider -a --keyring-backend file
 
-# 6. The deploy script automatically creates the akash-provider-keys K8s secret
+# The deploy script automatically creates the akash-provider-keys K8s secret
 # from AKASH_KEY and AKASH_KEY_SECRET in your .env
 ```
 
 Fill in the following in your `.env`:
 - `AKASH_KEY` — Base64-encoded content of `key.txt`
-- `AKASH_KEY_SECRET` — The export password you set in step 3 (plain text)
-- `AKASH_FROM` — Your wallet address from step 5
+- `AKASH_KEY_SECRET` — The export password you set in step 5 (plain text)
+- `AKASH_FROM` — Your wallet address
 - `AKASH_DOMAIN` — Your provider domain (e.g. `akash-provider.duckdns.org`)
 - `AKASH_NODE` — Chain node RPC URL (e.g. `http://192.168.50.8:26657`)
 - `AKASH_EMAIL` — Your contact email

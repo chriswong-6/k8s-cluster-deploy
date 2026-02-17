@@ -220,23 +220,6 @@ sudo ./deploy.sh --skip-nvidia
 sudo ./deploy.sh --apps-only
 ```
 
-## Local Image: fastapi-llama
-
-The `fastapi-llama:abc` image is built locally and NOT available from any registry. Before deploying, you must:
-
-1. **Build locally** (if Dockerfile is available):
-   ```bash
-   docker build -t fastapi-llama:abc /path/to/source
-   docker save fastapi-llama:abc | sudo ctr -n k8s.io images import -
-   ```
-
-2. **Import from archive**:
-   ```bash
-   sudo ctr -n k8s.io images import fastapi-llama.tar
-   ```
-
-3. **Use a registry**: Update `manifests/apps/fastapi-llama.yaml` with your registry URL.
-
 ## Uninstall
 
 ```bash

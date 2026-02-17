@@ -83,17 +83,24 @@ If you want to join the Akash decentralized compute network as a Provider, you n
 ### 1. Install CLI & Create Wallet
 
 ```bash
-# Install Akash Provider Services CLI
-# Option A: Latest version (requires Ubuntu 24.04 / glibc >= 2.38)
+# Install Akash CLI
+# Option A: Latest provider-services (requires Ubuntu 24.04 / glibc >= 2.38)
 curl -sSfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | sh
+# This installs ./bin/provider-services
 
-# Option B: For Ubuntu 22.04 (glibc 2.35) — use v0.6.4
+# Option B: For Ubuntu 22.04 (glibc 2.35)
+# provider-services v0.6.4 can create wallets but is incompatible with newer chain APIs.
+# For wallet creation only:
 curl -L https://github.com/akash-network/provider/releases/download/v0.6.4/provider-services_0.6.4_linux_amd64.zip -o /tmp/ps.zip
 unzip -o /tmp/ps.zip -d ./bin/ && chmod +x ./bin/provider-services
+# For chain operations (steps 2-5), copy the akash binary from the chain node machine:
+scp <chain-node-user>@<chain-node-ip>:/path/to/akash ./bin/akash && chmod +x ./bin/akash
 
 # Create a new wallet (save the mnemonic!)
 ./bin/provider-services keys add my-provider --keyring-backend file
 ```
+
+> **Ubuntu 22.04 note**: `provider-services v0.6.4` works for wallet creation (step 1) but returns `akash-api: unknown client version` for chain transactions. Use the `akash` binary copied from the chain node for steps 2-5. In the commands below, replace `./bin/provider-services` with `./bin/akash`.
 
 ### 2. Fund Your Wallet
 
@@ -119,7 +126,7 @@ Your new wallet needs AKT tokens to pay for on-chain transactions. Transfer AKT 
 ### 3. Register Provider On-Chain
 
 ```bash
-# Create provider.yaml
+# Create provider.yaml (update email and domain for your setup)
 cat > ~/provider.yaml <<'EOF'
 host: https://akash-provider.duckdns.org:8443
 attributes:

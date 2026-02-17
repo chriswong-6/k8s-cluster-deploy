@@ -80,27 +80,18 @@ Key packages included: PyTorch 1.13.1, torchvision 0.14.1, carla 0.9.10, opencv,
 
 If you want to join the Akash decentralized compute network as a Provider, you need to create your own wallet and keys before configuring `.env`.
 
-### 1. Install CLI & Create Wallet
+### 1. Install Akash CLI & Create Wallet
+
+The `akash` CLI (from [akash-network/node](https://github.com/akash-network/node)) is used for wallet management and chain operations. The Provider service itself runs inside a K8s Pod via Helm — you do NOT need `provider-services` on the host.
 
 ```bash
-# Install Akash CLI
-# Option A: Latest provider-services (requires Ubuntu 24.04 / glibc >= 2.38)
-curl -sSfL https://raw.githubusercontent.com/akash-network/provider/main/install.sh | sh
-# This installs ./bin/provider-services
-
-# Option B: For Ubuntu 22.04 (glibc 2.35)
-# provider-services v0.6.4 can create wallets but is incompatible with newer chain APIs.
-# For wallet creation only:
-curl -L https://github.com/akash-network/provider/releases/download/v0.6.4/provider-services_0.6.4_linux_amd64.zip -o /tmp/ps.zip
-unzip -o /tmp/ps.zip -d ./bin/ && chmod +x ./bin/provider-services
-# For chain operations (steps 2-5), copy the akash binary from the chain node machine:
-scp <chain-node-user>@<chain-node-ip>:/path/to/akash ./bin/akash && chmod +x ./bin/akash
+# Copy the akash binary from the chain node machine
+scp <chain-node-user>@<chain-node-ip>:/path/to/akash ./bin/akash
+chmod +x ./bin/akash
 
 # Create a new wallet (save the mnemonic!)
-./bin/provider-services keys add my-provider --keyring-backend file
+./bin/akash keys add my-provider --keyring-backend file
 ```
-
-> **Ubuntu 22.04 note**: `provider-services v0.6.4` works for wallet creation (step 1) but returns `akash-api: unknown client version` for chain transactions. Use the `akash` binary copied from the chain node for steps 2-5. In the commands below, replace `./bin/provider-services` with `./bin/akash`.
 
 ### 2. Fund Your Wallet
 
@@ -108,7 +99,7 @@ Your new wallet needs AKT tokens to pay for on-chain transactions. Transfer AKT 
 
 ```bash
 # From an existing funded wallet (on the chain node machine):
-./bin/provider-services tx bank send <funded-wallet> <new-wallet-address> 10000000uakt \
+./bin/akash tx bank send <funded-wallet> <new-wallet-address> 10000000uakt \
   --chain-id local-test \
   --node http://192.168.50.8:26657 \
   --keyring-backend test \
@@ -117,7 +108,7 @@ Your new wallet needs AKT tokens to pay for on-chain transactions. Transfer AKT 
   -y
 
 # Verify balance on the new wallet
-./bin/provider-services query bank balances <new-wallet-address> \
+./bin/akash query bank balances <new-wallet-address> \
   --node http://192.168.50.8:26657
 ```
 
@@ -142,7 +133,7 @@ info:
 EOF
 
 # Register as a Provider
-./bin/provider-services tx provider create ~/provider.yaml \
+./bin/akash tx provider create ~/provider.yaml \
   --from my-provider \
   --chain-id local-test \
   --node http://192.168.50.8:26657 \
@@ -156,7 +147,7 @@ EOF
 
 ```bash
 # Generate client certificate
-./bin/provider-services tx cert generate client \
+./bin/akash tx cert generate client \
   --from my-provider \
   --chain-id local-test \
   --node http://192.168.50.8:26657 \
@@ -166,7 +157,7 @@ EOF
   -y
 
 # Publish certificate to chain
-./bin/provider-services tx cert publish client \
+./bin/akash tx cert publish client \
   --from my-provider \
   --chain-id local-test \
   --node http://192.168.50.8:26657 \
@@ -181,14 +172,14 @@ EOF
 ```bash
 # Export the private key to a file
 # You will be prompted to set an export password — this becomes your AKASH_KEY_SECRET
-./bin/provider-services keys export my-provider --keyring-backend file > key.txt
+./bin/akash keys export my-provider --keyring-backend file > key.txt
 
 # Base64-encode the key file for .env
 cat key.txt | base64 -w 0
 # Copy this output as your AKASH_KEY value in .env
 
 # Get your wallet address for AKASH_FROM
-./bin/provider-services keys show my-provider -a --keyring-backend file
+./bin/akash keys show my-provider -a --keyring-backend file
 
 # The deploy script automatically creates the akash-provider-keys K8s secret
 # from AKASH_KEY and AKASH_KEY_SECRET in your .env

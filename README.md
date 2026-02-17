@@ -76,9 +76,8 @@ If you want to join the Akash decentralized compute network as a Provider, you n
 The `akash` CLI (from [akash-network/node](https://github.com/akash-network/node)) is used for wallet management and chain operations. The Provider service itself runs inside a K8s Pod via Helm — you do NOT need `provider-services` on the host.
 
 ```bash
-# Copy the akash binary from the chain node machine
-scp <chain-node-user>@<chain-node-ip>:/path/to/akash ./bin/akash
-chmod +x ./bin/akash
+# Install akash CLI v1.1.0
+bash scripts/install-akash-cli.sh
 
 # Create a new wallet (save the mnemonic!)
 ./bin/akash keys add my-provider --keyring-backend file

@@ -2,7 +2,7 @@
 # Uses Chinese mirror registry (registry.cn-beijing.aliyuncs.com) by default.
 # To use international mirrors, set imageRepositoryHost to "" or a public registry.
 
-imageRepositoryHost: registry.cn-beijing.aliyuncs.com
+imageRepositoryHost: ""
 
 installation:
   namespace: koordinator-system

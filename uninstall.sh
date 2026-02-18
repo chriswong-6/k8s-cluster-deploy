@@ -6,6 +6,8 @@
 #   sudo ./uninstall.sh --apps-only   # Only remove custom applications
 #   sudo ./uninstall.sh --full        # Full teardown: K8s + drivers + packages
 #   sudo ./uninstall.sh --full --keep-nvidia  # Full teardown but keep NVIDIA drivers
+#   sudo ./uninstall.sh --purge-akash         # Remove Akash CLI, wallet, keys, certificates
+#   sudo ./uninstall.sh --purge-conda         # Remove conda environment 'cluster'
 #
 set -euo pipefail
 
@@ -15,6 +17,8 @@ source "${SCRIPT_DIR}/scripts/utils.sh"
 APPS_ONLY=false
 FULL_RESET=false
 KEEP_NVIDIA=false
+PURGE_AKASH=false
+PURGE_CONDA=false
 
 for arg in "$@"; do
     case $arg in
@@ -27,6 +31,12 @@ for arg in "$@"; do
         --keep-nvidia)
             KEEP_NVIDIA=true
             ;;
+        --purge-akash)
+            PURGE_AKASH=true
+            ;;
+        --purge-conda)
+            PURGE_CONDA=true
+            ;;
         --help|-h)
             echo "Usage: sudo ./uninstall.sh [OPTIONS]"
             echo ""
@@ -34,6 +44,8 @@ for arg in "$@"; do
             echo "  --apps-only     Only remove custom applications"
             echo "  --full          Full teardown: K8s + drivers + packages"
             echo "  --keep-nvidia   With --full: keep NVIDIA drivers installed"
+            echo "  --purge-akash   Remove Akash CLI, wallet, keys, and certificates"
+            echo "  --purge-conda   Remove conda environment 'cluster'"
             echo "  --help, -h      Show this help message"
             exit 0
             ;;
@@ -227,6 +239,53 @@ if [ "$FULL_RESET" = true ]; then
     log_success "   Full reset completed"
     log_success "============================================"
     log_info "System is clean. Reboot recommended: sudo reboot"
+fi
+
+# --- Purge Akash CLI, wallet, keys, certificates ---
+if [ "$PURGE_AKASH" = true ]; then
+    log_warn "--- Purging Akash CLI and wallet data ---"
+
+    # Remove Akash CLI binary
+    AKASH_BIN="${SCRIPT_DIR}/bin/akash"
+    if [ -f "$AKASH_BIN" ]; then
+        rm -f "$AKASH_BIN"
+        log_info "Removed Akash CLI: $AKASH_BIN"
+    fi
+
+    # Remove Akash keyring and certificates for all users
+    for USER_HOME in /home/* /root; do
+        if [ -d "${USER_HOME}/.akash" ]; then
+            rm -rf "${USER_HOME}/.akash"
+            log_info "Removed ${USER_HOME}/.akash"
+        fi
+    done
+
+    log_success "Akash CLI and wallet data purged."
+    log_warn "Note: On-chain provider registration and certificates cannot be removed by this script."
+fi
+
+# --- Purge conda environment ---
+if [ "$PURGE_CONDA" = true ]; then
+    log_warn "--- Purging conda environment 'cluster' ---"
+
+    # Find conda installation
+    CONDA_BIN=""
+    for USER_HOME in /home/* /root; do
+        for CONDA_PATH in "${USER_HOME}/anaconda3" "${USER_HOME}/miniconda3"; do
+            if [ -x "${CONDA_PATH}/bin/conda" ]; then
+                CONDA_BIN="${CONDA_PATH}/bin/conda"
+                break 2
+            fi
+        done
+    done
+
+    if [ -n "$CONDA_BIN" ]; then
+        log_info "Found conda at: $CONDA_BIN"
+        "$CONDA_BIN" env remove -n cluster -y 2>/dev/null || true
+        log_success "Conda environment 'cluster' removed."
+    else
+        log_warn "conda not found. Skipping."
+    fi
 fi
 
 log_success "============================================"

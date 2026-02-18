@@ -234,6 +234,15 @@ sudo ./uninstall.sh --full
 # Full teardown but keep NVIDIA drivers installed
 sudo ./uninstall.sh --full --keep-nvidia
 # Reboot recommended after --full
+
+# Purge Akash CLI, wallet, keys, and certificates
+sudo ./uninstall.sh --purge-akash
+
+# Purge conda environment 'cluster'
+sudo ./uninstall.sh --purge-conda
+
+# Combine flags as needed
+sudo ./uninstall.sh --full --keep-nvidia --purge-akash --purge-conda
 ```
 
 | Flag | Removes |
@@ -242,6 +251,8 @@ sudo ./uninstall.sh --full --keep-nvidia
 | *(no flag)* | Helm releases + CRDs + PVCs + namespaces |
 | `--full` | All above + K8s packages + containerd + NVIDIA drivers/toolkit + Helm + data |
 | `--full --keep-nvidia` | Same as `--full` but keeps NVIDIA drivers (only removes container toolkit) |
+| `--purge-akash` | Akash CLI binary + `~/.akash/` (wallet, keys, certificates) |
+| `--purge-conda` | Conda environment `cluster` |
 
 ## Verification
 

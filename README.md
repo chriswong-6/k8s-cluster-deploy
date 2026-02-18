@@ -8,8 +8,7 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 |-----------|---------|-------------|
 | Kubernetes | v1.28.15 | kubeadm + containerd |
 | Calico CNI | v3.27.2 | Pod networking (IPIP mode) |
-| NVIDIA Driver | 560.35.03 | GPU driver + CUDA 12.6 |
-| NVIDIA Container Toolkit | latest | GPU container runtime |
+| NVIDIA Container Toolkit | latest | GPU container runtime (driver pre-installed by user) |
 | Koordinator | v1.6.0 | Advanced scheduling + HAMi GPU sharing |
 | OpenFaaS | 14.2.103 | Serverless function platform |
 | kube-prometheus-stack | 77.9.1 | Prometheus + Grafana monitoring |
@@ -21,7 +20,7 @@ Deploy a complete Kubernetes single-node cluster with GPU scheduling, Serverless
 ## Prerequisites
 
 - **OS**: Ubuntu 22.04 or 24.04 LTS
-- **GPU**: NVIDIA RTX 4090 (or compatible)
+- **GPU**: NVIDIA GPU with driver pre-installed (`nvidia-smi` must work)
 - **RAM**: 16GB+ recommended
 - **CPU**: 4+ cores recommended
 - **Disk**: 100GB+ free space
@@ -212,7 +211,7 @@ sudo ./deploy.sh
 # Skip K8s install (if Kubernetes is already running)
 sudo ./deploy.sh --skip-k8s
 
-# Skip NVIDIA driver install (if drivers are already installed)
+# Skip NVIDIA container toolkit setup (if already configured)
 sudo ./deploy.sh --skip-nvidia
 
 # Deploy only application layer (K8s + components assumed ready)

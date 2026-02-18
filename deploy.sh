@@ -4,7 +4,7 @@
 # Usage:
 #   sudo ./deploy.sh                  # Full deployment
 #   sudo ./deploy.sh --skip-k8s       # Skip K8s install (if already installed)
-#   sudo ./deploy.sh --skip-nvidia    # Skip NVIDIA driver install
+#   sudo ./deploy.sh --skip-nvidia    # Skip NVIDIA container toolkit setup
 #   sudo ./deploy.sh --apps-only      # Only deploy applications (K8s + components assumed ready)
 #
 set -euo pipefail
@@ -33,7 +33,7 @@ for arg in "$@"; do
             echo ""
             echo "Options:"
             echo "  --skip-k8s       Skip Kubernetes installation (steps 0-3)"
-            echo "  --skip-nvidia    Skip NVIDIA driver installation (step 4)"
+            echo "  --skip-nvidia    Skip NVIDIA container toolkit setup (step 4)"
             echo "  --apps-only      Only deploy applications (steps 6-7)"
             echo "  --help, -h       Show this help message"
             exit 0

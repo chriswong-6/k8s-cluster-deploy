@@ -1,51 +1,25 @@
 #!/usr/bin/env bash
-# 04-install-nvidia.sh - Install NVIDIA Driver, CUDA Toolkit, and Container Toolkit
+# 04-install-nvidia.sh - Configure NVIDIA Container Toolkit, RuntimeClass, and MPS
+# Requires: NVIDIA driver pre-installed (nvidia-smi must work)
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "${SCRIPT_DIR}/utils.sh"
 
-NVIDIA_DRIVER_VERSION="560"
+log_info "=== Step 4: Configuring NVIDIA GPU stack ==="
+log_info "Note: NVIDIA driver and CUDA toolkit must be pre-installed by the user."
 
-log_info "=== Step 4: Installing NVIDIA GPU stack ==="
-
-# Check for NVIDIA GPU
-if ! lspci | grep -qi nvidia; then
-    log_error "No NVIDIA GPU detected. Skipping NVIDIA installation."
-    log_error "GPU-dependent components will not function."
+# Verify NVIDIA driver is installed
+if ! nvidia-smi &>/dev/null; then
+    log_error "nvidia-smi not found or not functional."
+    log_error "Please install NVIDIA drivers before running this script."
+    log_error "  Ubuntu: sudo apt install nvidia-driver-560"
     exit 1
 fi
 
-# ---- NVIDIA Driver ----
-if check_command nvidia-smi; then
-    DRIVER_VER=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>/dev/null | head -1)
-    log_info "NVIDIA driver is already installed (version: $DRIVER_VER)."
-else
-    log_info "Installing NVIDIA driver ${NVIDIA_DRIVER_VERSION}..."
-    apt-get update -qq
-    apt-get install -y -qq "nvidia-driver-${NVIDIA_DRIVER_VERSION}" >/dev/null 2>&1
-    log_success "NVIDIA driver installed. A reboot may be required."
-fi
-
-# Verify driver
-if nvidia-smi &>/dev/null; then
-    log_success "NVIDIA driver is functional."
-    nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader
-else
-    log_error "nvidia-smi failed. You may need to reboot."
-    log_error "After reboot, re-run: sudo bash scripts/04-install-nvidia.sh"
-    exit 1
-fi
-
-# ---- CUDA Toolkit ----
-if check_command nvcc; then
-    CUDA_VER=$(nvcc --version 2>/dev/null | grep "release" | awk '{print $5}' | tr -d ',' || echo "unknown")
-    log_info "CUDA Toolkit is already installed (version: $CUDA_VER)."
-else
-    log_info "Installing CUDA Toolkit..."
-    apt-get install -y -qq nvidia-cuda-toolkit >/dev/null 2>&1 || true
-    log_success "CUDA Toolkit installed."
-fi
+DRIVER_VER=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>/dev/null | head -1)
+log_success "NVIDIA driver detected (version: $DRIVER_VER)."
+nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader
 
 # ---- NVIDIA Container Toolkit ----
 if check_command nvidia-ctk; then

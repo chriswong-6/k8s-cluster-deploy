@@ -156,6 +156,12 @@ if [ "$DEPLOY_AKASH" = "true" ]; then
             -n akash-services \
             --from-literal=key.txt="$(echo "${AKASH_KEY}" | base64 -d)" \
             --from-literal=key-pass.txt="${AKASH_KEY_SECRET}"
+        # Add Helm ownership labels so Helm can adopt this secret
+        kubectl label secret akash-provider-keys -n akash-services \
+            app.kubernetes.io/managed-by=Helm
+        kubectl annotate secret akash-provider-keys -n akash-services \
+            meta.helm.sh/release-name=akash-provider \
+            meta.helm.sh/release-namespace=akash-services
         log_success "akash-provider-keys secret created."
     fi
 
